@@ -1,0 +1,72 @@
+.v-application {
+  background-color: var(--v-background-base) !important;
+}
+
+.v-card {
+  background-color: var(--v-cardbackground-base) !important;
+}
+
+.v-expansion-panel {
+  background-color: var(--v-cardbackground-base) !important;
+}
+
+/* .v-tab {
+  background-color: var(--v-cardbackground-base) !important;
+} */
+
+.v-tab-item {
+  background-color: var(--v-cardbackground-base) !important;
+}
+.v-window {
+  background-color: var(--v-cardbackground-base) !important;
+}
+.v-data-table {
+  background-color: var(--v-cardbackground-base) !important;
+}
+.v-toolbar {
+  background-color: var(--v-background-base) !important;
+}
+
+.v-list {
+  background-color: var(--v-cardbackground-base) !important;
+}
+.v-footer {
+  background-color: var(--v-cardbackground-base) !important;
+}
+
+.fitPotPrimaryIcon:hover {
+  color: var(--v-primary-base) !important;
+}
+
+.fitPotErrorIcon:hover {
+  color: var(--v-error-base) !important;
+}
+
+.fitPotInfoIcon:hover {
+  color: var(--v-info-base) !important;
+}
+
+.fitPotSuccessIcon:hover {
+  color: var(--v-success-base) !important;
+}
+
+.v-dialog.v-dialog--active .popup-header {
+  cursor: grab;
+}
+
+.v-dialog.v-dialog--active .popup-header:active {
+  cursor: grabbing;
+}
+.v-data-table-header-mobile{
+  display: none !important;
+}
+.v-data-table-header-mobile__wrapper{
+  display: none !important;
+}
+.status {
+  font-size: 40px;
+  margin: 2px 2px 0 0;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 10px;
+}
