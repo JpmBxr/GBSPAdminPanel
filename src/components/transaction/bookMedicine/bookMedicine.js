@@ -97,27 +97,31 @@ export const bookMedicine = {
       book_medicine_current_status: null,
 
       tableItems: [],
-      medicineDocsUrl:null,
+      medicineDocsUrl: null,
       statusItems: [
         {
-           value: 1,
+          value: 1,
           text: "Submitted"
         },
         {
-           value: 2,
+          value: 2,
           text: "Accepted"
         },
         {
-           value: 3,
+          value: 3,
           text: "Rejected"
         },
         {
-           value: 4,
-          text: "Order Dispatched"
+          value: 4,
+          text: "Dispatched"
         },
         {
-           value: 5,
+          value: 5,
           text: "Delivered"
+        },
+        {
+          value: 6,
+          text: "Not Delivered"
         },
       ],
       show: true,
@@ -125,7 +129,7 @@ export const bookMedicine = {
       pagination: {},
       module: "Transaction",
       entity: "Book Medicine",
-      medicineDocsUrl :null,
+      medicineDocsUrl: null,
       searchText: "",    // search
 
       // excel
@@ -146,12 +150,12 @@ export const bookMedicine = {
 
   //#region created
   created() {
-   
+
     this.medicineDocsUrl = Global.medicineDocsUrl;
     // To get Details in List
     this.getDetails();
 
-   
+
   },
   //#endregion
 
@@ -191,8 +195,8 @@ export const bookMedicine = {
         sortColumn: sortBy,
         sortOrder: sortDesc,
         page: page,
-        searchText:this.searchText,
-        book_medicine_current_status:this.book_medicine_current_status,
+        searchText: this.searchText,
+        book_medicine_current_status: this.book_medicine_current_status,
       })
         .then((response) => {
           this.tableDataLoading = false;
@@ -238,7 +242,7 @@ export const bookMedicine = {
         ApiService.post(ApiEndPoint.BookMedicine.webChangeBookMedicineStatus, {
           book_medicine_id: item.book_medicine_id,
           book_medicine_current_status: item.book_medicine_current_status,
-         
+
           // secureLS.set(Global.userId, response.data.userData.user_id);
         })
           .then((response) => {
@@ -260,7 +264,7 @@ export const bookMedicine = {
       }
     },
 
-    viewMedicineDoc(item){
+    viewMedicineDoc(item) {
       this.$router.push({
         name: "viewMedicineDoc",
         query: {
@@ -270,8 +274,8 @@ export const bookMedicine = {
       });
     },
 
-    
-    
+
+
     //#endregion
   }
   //#endregion

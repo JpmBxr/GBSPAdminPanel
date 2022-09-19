@@ -244,11 +244,9 @@ export const doctorMaster = {
         await this.getArea();
         let area_id = this.areaItems.filter((a) => item?.area_id.split(",").includes(String(a.area_id))).map(i => i);
 
-        const disease_category_id = this.diseaseCategoryItems.filter((d) => item?.disease_category_id.split(",").includes(String(d.disease_category_id))).map(i => i);
+        let disease_category_id = this.diseaseCategoryItems.filter((d) => item?.disease_category_id.split(",").includes(String(d.disease_category_id))).map(i => i);
 
         const [doctor_first_name, doctor_last_name] = item?.doctor_full_name?.split(" ");
-
-        // const doctor_is_approved = this.doctorApprovedItems.map((i) => i.value === item.doctor_is_approved)
 
         this.item = {
           ...item,
@@ -257,7 +255,6 @@ export const doctorMaster = {
           disease_category_id,
           doctor_first_name, 
           doctor_last_name,
-          // doctor_is_approved,
           
         };
         this.addEditText = `Edit ${this.entity} : ` + item.doctor_full_name;
@@ -308,22 +305,21 @@ export const doctorMaster = {
     //#endregion
 
     //#region  to load City
-    getDiseaseCategory() {
+    async getDiseaseCategory() {
       this.isDialogLoaderActive = true;
-      ApiService.get(
-        ApiEndPoint.Doctor.webGetDiseaseCategory,
-        {}
-      )
-        .then((response) => {
-          this.isDialogLoaderActive = false;
-          this.diseaseCategoryItems = response.data.resultData;
-        })
-        .catch((error) => {
-          this.isDialogLoaderActive = false;
-          if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
+      try {
+       const response = await ApiService.get(
+          ApiEndPoint.Doctor.webGetDiseaseCategory,
+          {}
+        )
+        this.isDialogLoaderActive = false;
+        this.diseaseCategoryItems = response.data.resultData;  
+      } catch (error) {
+        this.isDialogLoaderActive = false;
+        if (error.response.status != 401 && error.response.status != 403) {
+          this.showErrorAlert(true, "error", "Something went wrong");
+        }
+      }
     },
     //#endregion
 
@@ -338,7 +334,6 @@ export const doctorMaster = {
           if (this.doctorProfileImage != null) {
             postData.append("doctor_profile_image", this.doctorProfileImage);
           }
-          postData.append("disease_category_id", 0);
           postData.append("city_id", this.item.city_id);
           postData.append("area_id", this.item.area_id);
           postData.append("disease_category_id", this.item.disease_category_id);
@@ -376,14 +371,16 @@ export const doctorMaster = {
 
           //update
           this.isDialogLoaderActive = true;
+
+          
+
           let postData = new FormData();
           if (this.doctorProfileImage != null) {
             postData.append("doctor_profile_image", this.doctorProfileImage);
           }
-          postData.append("disease_category_id", 0);
           postData.append("city_id", this.item.city_id.toString());
           postData.append("area_id", this.item.area_id.toString());
-          postData.append("disease_category_id", this.item.disease_category_id);
+          postData.append("disease_category_id", this.item.disease_category_id.toString());
           postData.append("doctor_overall_experience", this.item.doctor_overall_experience);
           postData.append("doctor_first_name", this.item.doctor_first_name);
           postData.append("doctor_last_name", this.item.doctor_last_name);
@@ -394,7 +391,7 @@ export const doctorMaster = {
           postData.append("experience_name", this.item.experience_name);
           postData.append("doctor_id", this.item.doctor_id);
 
-          ApiService.post(ApiEndPoint.Doctor.webUpdateDoctorDetails, postData)
+          ApiService.post(ApiEndPoint.Doctor.webUpdateDoctorDetails, postData,)
             .then((response) => {
               this.isDialogLoaderActive = false;
               this.close();

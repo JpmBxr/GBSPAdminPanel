@@ -113,7 +113,7 @@ export const bookTest = {
         },
         {
            value: 4,
-          text: "Booking done"
+          text: "Booking Done"
         },
         {
            value: 5,
