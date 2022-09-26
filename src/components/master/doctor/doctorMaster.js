@@ -10,21 +10,6 @@ export const doctorMaster = {
     return {
       // Data Table
 
-      // CityId:
-      //   this.addDoctorDataProps != null
-      //     ? this.addDoctorDataProps.item.city_id.split(",").map(Number)
-      //     : null,
-      // AreaId:
-      //   this.addDoctorDataProps != null
-      //     ? this.addDoctorDataProps.item.area_id.split(",").map(Number)
-      //     : null,
-      // DiseaseCategoryId:
-      //   this.addDoctorDataProps != null
-      //     ? this.addDoctorDataProps.item.disease_category_id
-      //         .split(",")
-      //         .map(Number)
-      //     : null,
-
       tableLoadingDataText: "Loading data",
       tableHeader: [
         {
