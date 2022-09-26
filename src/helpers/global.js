@@ -4,8 +4,14 @@ export const Global = {
   // appBaseUrl: "https://dmeet.dreamplesk.com/public/api/",
   // profileImageUrl:
   //   "https://dmeet.dreamplesk.com/public/storage/profile_images/",
+  // medicineDocsUrl:
+  // "https://dmeet.dreamplesk.com/public/storage/prescription_doc/",
+
+  // testDocsUrl:
+  // "https://dmeet.dreamplesk.com/public/storage/book_test_doc/",
   // #endregion
-//#region demo
+
+  //#region demo
   appBaseUrl: "https://gbscuat.dreamplesk.com/public/api/",
 
   profileImageUrl:
