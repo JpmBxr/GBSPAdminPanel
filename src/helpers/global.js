@@ -12,29 +12,29 @@ export const Global = {
   // #endregion
 
   //#region demo
-  appBaseUrl: "https://gbscuat.dreamplesk.com/public/api/",
+  // appBaseUrl: "https://gbscuat.dreamplesk.com/public/api/",
 
-  profileImageUrl:
-    "https://gbscuat.dreamplesk.com/public/storage/user_profile_pic/",
+  // profileImageUrl:
+  //   "https://gbscuat.dreamplesk.com/public/storage/user_profile_pic/",
 
-  medicineDocsUrl:
-  "https://gbscuat.dreamplesk.com/public/storage/prescription_doc/",
+  // medicineDocsUrl:
+  // "https://gbscuat.dreamplesk.com/public/storage/prescription_doc/",
 
-  testDocsUrl:
-  "https://gbscuat.dreamplesk.com/public/storage/book_test_doc/",
+  // testDocsUrl:
+  // "https://gbscuat.dreamplesk.com/public/storage/book_test_doc/",
   //#endregion
 
   // // // #region Urls
-  // appBaseUrl: "https://apis.gbsc.co.in/public/api/",
+  appBaseUrl: "https://apis.gbsc.co.in/public/api/",
 
-  // profileImageUrl:
-  //   "https://apis.gbsc.co.in/public/storage/user_profile_pic/",
+  profileImageUrl:
+    "https://apis.gbsc.co.in/public/storage/user_profile_pic/",
 
-  // medicineDocsUrl:
-  // "https://apis.gbsc.co.in/public/storage/prescription_doc/",
+  medicineDocsUrl:
+  "https://apis.gbsc.co.in/public/storage/prescription_doc/",
 
-  // testDocsUrl:
-  // "https://apis.gbsc.co.in/public/storage/book_test_doc/",
+  testDocsUrl:
+  "https://apis.gbsc.co.in/public/storage/book_test_doc/",
   // // #endregion
 
   // server url
