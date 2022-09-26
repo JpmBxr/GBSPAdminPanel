@@ -9,6 +9,22 @@ export const doctorMaster = {
   data() {
     return {
       // Data Table
+
+      // CityId:
+      //   this.addDoctorDataProps != null
+      //     ? this.addDoctorDataProps.item.city_id.split(",").map(Number)
+      //     : null,
+      // AreaId:
+      //   this.addDoctorDataProps != null
+      //     ? this.addDoctorDataProps.item.area_id.split(",").map(Number)
+      //     : null,
+      // DiseaseCategoryId:
+      //   this.addDoctorDataProps != null
+      //     ? this.addDoctorDataProps.item.disease_category_id
+      //         .split(",")
+      //         .map(Number)
+      //     : null,
+
       tableLoadingDataText: "Loading data",
       tableHeader: [
         {
@@ -87,16 +103,6 @@ export const doctorMaster = {
       cityItems: [],
       areaItems: [],
       diseaseCategoryItems: [],
-      doctorApprovedItems: [
-        {
-          "value": "0",
-          "name": "No",
-        },
-        {
-          "value": "1",
-          "name": "Yes",
-        }
-      ],
       imageRule: [],
       doctorProfileImage: null,
       profileImageUrl: null,
@@ -113,11 +119,9 @@ export const doctorMaster = {
         doctor_overall_experience: "doctor_overall_experience",
         Status: "doctor_is_active",
       },
-      excelFileName:
-        "Doctor" + "_" + moment().format("DD/MM/YYYY") + ".xls",
+      excelFileName: "Doctor" + "_" + moment().format("DD/MM/YYYY") + ".xls",
       //end
     };
-
   },
   //#endregion
 
@@ -126,16 +130,6 @@ export const doctorMaster = {
     //  get the Doctor Details List
     this.profileImageUrl = Global.profileImageUrl;
     this.getDoctorDetailsList();
-    
-
-  },
-  //#endregion
-
-   //#region loading City, Area on page load/ mount 
-   mounted() {
-    // Show Add in dialog
-    this.getCity();
-
   },
   //#endregion
 
@@ -159,7 +153,7 @@ export const doctorMaster = {
     },
     //#endregion
 
-    //#region 
+    //#region
     doctorProfileImage(val) {
       this.doctorProfileImage = val;
       this.imageRule =
@@ -180,13 +174,11 @@ export const doctorMaster = {
   },
   //#endregion
 
-
-  //#region loading City, Area on page load/ mount 
+  //#region loading City, Area on page load/ mount
   mounted() {
     // Show Add in dialog
     this.getCity();
     this.getDiseaseCategory();
-
   },
   //#endregion
 
@@ -213,7 +205,7 @@ export const doctorMaster = {
         .catch((error) => {
           this.tableDataLoading = false;
           if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
+            Global.showErrorAlert(true, "error", "Something went wrong");
           }
         });
     },
@@ -230,33 +222,44 @@ export const doctorMaster = {
 
     //#region  show add/edit dialog
     async showAddEditDialog(item) {
-      
       // Show Add
       if (item == null && this.isAddEdit == true) {
         this.addEditText = `Add ${this.entity}`;
         this.addEditDialog = true;
         this.addUpdateButtonText = " Add ";
       } else {
-        // Show Edit (Update)
-
-        let city_id = this.cityItems.filter((c) => item?.city_id.split(",").includes(String(c.city_id))).map(i => i)
-        this.item.city_id = item.city_id
+        await this.getCity();
+        this.item.city_id = item.city_id;
         await this.getArea();
-        let area_id = this.areaItems.filter((a) => item?.area_id.split(",").includes(String(a.area_id))).map(i => i);
+        await this.getDiseaseCategory();
+        // Show Edit (Update)
+        const [doctor_first_name, doctor_last_name] =
+          item?.doctor_full_name?.split(" ");
 
-        let disease_category_id = this.diseaseCategoryItems.filter((d) => item?.disease_category_id.split(",").includes(String(d.disease_category_id))).map(i => i);
+        let city_id = this.cityItems
+          .filter((c) => item?.city_id.split(",").includes(String(c.city_id)))
+          .map((i) => i);
 
-        const [doctor_first_name, doctor_last_name] = item?.doctor_full_name?.split(" ");
+        let area_id = this.areaItems
+          .filter((a) => item?.area_id.split(",").includes(String(a.area_id)))
+          .map((i) => i);
+        let disease_category_id = this.diseaseCategoryItems
+          .filter((d) =>
+            item?.disease_category_id
+              .split(",")
+              .includes(String(d.disease_category_id))
+          )
+          .map((i) => i);
 
         this.item = {
           ...item,
           city_id,
           area_id,
           disease_category_id,
-          doctor_first_name, 
+          doctor_first_name,
           doctor_last_name,
-          
         };
+
         this.addEditText = `Edit ${this.entity} : ` + item.doctor_full_name;
         this.addEditDialog = true;
         this.addUpdateButtonText = "Update";
@@ -265,25 +268,23 @@ export const doctorMaster = {
     //#endregion
 
     //#region  to load City
-    getCity() {
+    async getCity() {
       this.isDialogLoaderActive = true;
-      ApiService.get(
-        ApiEndPoint.Doctor.getCityIdWithoutPagination,
-        {}
-      )
-        .then((response) => {
-          this.isDialogLoaderActive = false;
-          this.cityItems = response.data.resultData;
-        })
-        .catch((error) => {
-          this.isDialogLoaderActive = false;
-          if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
+      try {
+        const response = await ApiService.get(
+          ApiEndPoint.Doctor.getCityIdWithoutPagination,
+          {}
+        );
+        this.isDialogLoaderActive = false;
+        this.cityItems = response.data.resultData;
+      } catch (error) {
+        this.isDialogLoaderActive = false;
+        if (error.response?.status != 401 && error.response?.status != 403) {
+          Global.showErrorAlert(true, "error", "Something went wrong");
+        }
+      }
     },
     //#endregion
-
 
     //#region  to load Area
     async getArea() {
@@ -292,13 +293,13 @@ export const doctorMaster = {
         const response = await ApiService.get(
           ApiEndPoint.Doctor.getAreaIdWithoutPagination,
           { city_id: this.item.city_id.toString() }
-        )
+        );
         this.areaItems = response.data.resultData;
         this.isDialogLoaderActive = false;
       } catch (error) {
         this.isDialogLoaderActive = false;
-        if (error.response.status != 401 && error.response.status != 403) {
-          this.showErrorAlert(true, "error", "Something went wrong");
+        if (error.response?.status != 401 && error.response?.status != 403) {
+          Global.showErrorAlert(true, "error", "Something went wrong");
         }
       }
     },
@@ -308,16 +309,17 @@ export const doctorMaster = {
     async getDiseaseCategory() {
       this.isDialogLoaderActive = true;
       try {
-       const response = await ApiService.get(
+        const response = await ApiService.get(
           ApiEndPoint.Doctor.webGetDiseaseCategory,
           {}
-        )
+        );
         this.isDialogLoaderActive = false;
-        this.diseaseCategoryItems = response.data.resultData;  
+        this.diseaseCategoryItems = response.data.resultData;
+        console.log("disease id", response.data.resultData);
       } catch (error) {
         this.isDialogLoaderActive = false;
-        if (error.response.status != 401 && error.response.status != 403) {
-          this.showErrorAlert(true, "error", "Something went wrong");
+        if (error.response?.status != 401 && error.response?.status != 403) {
+          Global.showErrorAlert(true, "error", "Something went wrong");
         }
       }
     },
@@ -325,7 +327,6 @@ export const doctorMaster = {
 
     //#region  add/edit item
     addEditItem() {
-
       if (this.$refs.holdingFormAddEdit.validate()) {
         if (this.isAddEdit) {
           // save
@@ -337,12 +338,19 @@ export const doctorMaster = {
           postData.append("city_id", this.item.city_id);
           postData.append("area_id", this.item.area_id);
           postData.append("disease_category_id", this.item.disease_category_id);
-          postData.append("doctor_overall_experience", this.item.doctor_overall_experience);
+
+          postData.append(
+            "doctor_overall_experience",
+            this.item.doctor_overall_experience
+          );
           postData.append("doctor_first_name", this.item.doctor_first_name);
           postData.append("doctor_last_name", this.item.doctor_last_name);
           postData.append("specialization_name", this.item.specialization_name);
           postData.append("education_name", this.item.education_name);
-          postData.append("doctor_mobile_number", this.item.doctor_mobile_number);
+          postData.append(
+            "doctor_mobile_number",
+            this.item.doctor_mobile_number
+          );
           postData.append("doctor_description", this.item.doctor_description);
           postData.append("experience_name", this.item.experience_name);
 
@@ -368,30 +376,55 @@ export const doctorMaster = {
               }
             });
         } else {
-
           //update
           this.isDialogLoaderActive = true;
-
-          
-
           let postData = new FormData();
           if (this.doctorProfileImage != null) {
             postData.append("doctor_profile_image", this.doctorProfileImage);
           }
-          postData.append("city_id", this.item.city_id.toString());
-          postData.append("area_id", this.item.area_id.toString());
-          postData.append("disease_category_id", this.item.disease_category_id.toString());
-          postData.append("doctor_overall_experience", this.item.doctor_overall_experience);
+          postData.append(
+            "city_id",
+            typeof this.item.city_id === "object"
+              ? this.item.city_id.map((d) => d.city_id).join(",")
+              : this.item.city_id !== null
+              ? this.item.city_id
+              : null
+          );
+          postData.append(
+            "area_id",
+            typeof this.item.area_id === "object"
+              ? this.item.area_id.map((d) => d.area_id).join(",")
+              :this.item.area_id != null
+              ? this.item.area_id
+              : null
+          );
+          postData.append(
+            "disease_category_id",
+            typeof this.item.disease_category_id === "object"
+              ? this.item.disease_category_id.map((d) => d.disease_category_id).join(",")
+              :this.item.disease_category_id != null
+              ? this.item.disease_category_id
+              : null
+          );
+
+          postData.append(
+            "doctor_overall_experience",
+            this.item.doctor_overall_experience
+          );
           postData.append("doctor_first_name", this.item.doctor_first_name);
           postData.append("doctor_last_name", this.item.doctor_last_name);
           postData.append("specialization_name", this.item.specialization_name);
           postData.append("education_name", this.item.education_name);
-          postData.append("doctor_mobile_number", this.item.doctor_mobile_number);
+          postData.append(
+            "doctor_mobile_number",
+            this.item.doctor_mobile_number
+          );
           postData.append("doctor_description", this.item.doctor_description);
           postData.append("experience_name", this.item.experience_name);
           postData.append("doctor_id", this.item.doctor_id);
 
-          ApiService.post(ApiEndPoint.Doctor.webUpdateDoctorDetails, postData,)
+          console.log("formData", postData);
+          ApiService.post(ApiEndPoint.Doctor.webUpdateDoctorDetails, postData)
             .then((response) => {
               this.isDialogLoaderActive = false;
               this.close();
@@ -422,10 +455,13 @@ export const doctorMaster = {
     close() {
       this.addEditDialog = false;
       setTimeout(() => {
-        this.item = Object.assign({}, {
-          cityItems: this.cityItems,
-          areaItems: this.areaItems,
-        });
+        this.item = Object.assign(
+          {},
+          {
+            cityItems: this.cityItems,
+            areaItems: this.areaItems,
+          }
+        );
       }, 300);
     },
     //#endregion
@@ -440,12 +476,10 @@ export const doctorMaster = {
       if (result.isConfirmed) {
         this.isLoaderActive = true;
 
-        ApiService.post(
-          ApiEndPoint.Doctor.changeDoctorDetailsStatus, {
+        ApiService.post(ApiEndPoint.Doctor.changeDoctorDetailsStatus, {
           doctor_id: item.doctor_id,
           doctor_is_active: item.doctor_is_active,
-        }
-        )
+        })
           .then((response) => {
             this.isLoaderActive = false;
             if (response.data.success == "true") {

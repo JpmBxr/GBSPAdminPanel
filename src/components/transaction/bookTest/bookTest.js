@@ -237,6 +237,7 @@ export const bookTest = {
         ApiService.post(ApiEndPoint.BookTest.webChangeBookTestStatus, {
           book_test_id: item.book_test_id,
           book_test_current_status: item.book_test_current_status,
+          updated_by: secureLS.get(Global.userId),
         })
           .then((response) => {
             this.isLoaderActive = false;

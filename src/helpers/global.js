@@ -5,8 +5,7 @@ export const Global = {
   // profileImageUrl:
   //   "https://dmeet.dreamplesk.com/public/storage/profile_images/",
   // #endregion
-
-  // // // #region Urls
+//#region demo
   appBaseUrl: "https://gbscuat.dreamplesk.com/public/api/",
 
   profileImageUrl:
@@ -17,7 +16,20 @@ export const Global = {
 
   testDocsUrl:
   "https://gbscuat.dreamplesk.com/public/storage/book_test_doc/",
-  // // // #endregion
+  //#endregion
+
+  // // // #region Urls
+  // appBaseUrl: "https://apis.gbsc.co.in/public/api/",
+
+  // profileImageUrl:
+  //   "https://apis.gbsc.co.in/public/storage/user_profile_pic/",
+
+  // medicineDocsUrl:
+  // "https://apis.gbsc.co.in/public/storage/prescription_doc/",
+
+  // testDocsUrl:
+  // "https://apis.gbsc.co.in/public/storage/book_test_doc/",
+  // // #endregion
 
   // server url
   //appBaseUrl:'http://139.59.68.79:82/api/inventory/',

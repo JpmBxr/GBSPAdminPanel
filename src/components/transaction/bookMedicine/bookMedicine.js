@@ -242,8 +242,7 @@ export const bookMedicine = {
         ApiService.post(ApiEndPoint.BookMedicine.webChangeBookMedicineStatus, {
           book_medicine_id: item.book_medicine_id,
           book_medicine_current_status: item.book_medicine_current_status,
-
-          // secureLS.set(Global.userId, response.data.userData.user_id);
+          updated_by: secureLS.get(Global.userId),
         })
           .then((response) => {
             this.isLoaderActive = false;
