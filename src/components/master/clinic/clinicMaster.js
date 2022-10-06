@@ -54,10 +54,17 @@ export const clinicMaster = {
           align: "start",
         },
         {
-          text: "Actions",
-          value: "actions",
+          text: "Add",
+          value: "add",
           sortable: false,
-          width: "30%",
+          width: "15%",
+          align: "end",
+        },
+        {
+          text: "Update",
+          value: "update",
+          sortable: false,
+          width: "15%",
           align: "end",
         },
 
@@ -128,7 +135,7 @@ export const clinicMaster = {
     // Show Add in dialog
     this.getCity();
     this.getClinicService();
-    this.getClinicTiing();
+    this.getClinicTiming();
 
   },
   //#endregion
@@ -147,24 +154,25 @@ export const clinicMaster = {
   //#endregion
   //#region watch setion
   watch: {
-    //#region  add/edit dialog
+    //add/edit dialog
     addEditDialog(value) {
       return value ? true : this.close();
     },
-    //#endregion
-    //#region  add/edit dialog
+    //Service dialog
     addServiceDialog(value) {
       return value ? true : this.close();
     },
-    //#endregion
-    //#region Pagination
+    //Timing dialog
+    addTimingDialog(value) {
+      return value ? true : this.close();
+    },
+    //Pagination
     pagination: {
       handler() {
         this.getClinicDetailsList();
       },
       deep: true,
     },
-    //#endregion
   },
   //#endregion
 
@@ -199,52 +207,6 @@ export const clinicMaster = {
     },
     //#endregion
 
-    //#region To get the Clinic Service
-    getClinicService() {
-      this.isDialogLoaderActive = true;
-      ApiService.get(
-        ApiEndPoint.Clinic.webGetClinicService,
-        {}
-      )
-        .then((response) => {
-          this.isDialogLoaderActive = false;
-          console.log(response);
-          this.clinicServiceItems = response.data.resultData;
-        })
-        .catch((error) => {
-          this.isDialogLoaderActive = false;
-          if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
-
-
-    },
-    //#endregion
-
-    //#region To get the Clinic Timing
-    getClinicTiing() {
-      this.isDialogLoaderActive = true;
-      ApiService.get(
-        ApiEndPoint.Clinic.webGetClinicTiming,
-        {}
-      )
-        .then((response) => {
-          this.isDialogLoaderActive = false;
-          console.log(response);
-          this.clinicTimingItems = response.data.resultData;
-        })
-        .catch((error) => {
-          this.isDialogLoaderActive = false;
-          if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
-
-
-    },
-    //#endregion
-
     //#region  search
     searchInfo() {
       clearTimeout(this._timerId);
@@ -270,40 +232,6 @@ export const clinicMaster = {
         this.getCity();
         this.getArea();
 
-      }
-    },
-    //#endregion
-
-    //#region  show add Service dialog
-    showAddServiceDialog(item) {
-      if (item == null && this.isAddService == true) {
-        this.addServiceText = `Add  ${this.entity}`;
-        this.addServiceDialog = true;
-        this.addUpdateButtonText = " Add ";
-      } else {
-        this.item = Object.assign({}, item);
-        this.addServiceText = `Edit ${this.addServiceText} : ` + item.clinic_full_name;
-        this.addServiceDialog = true;
-        this.addUpdateButtonText = "Update";
-        this.getClinicService();
-      }
-    },
-    //#endregion
-
-    //#region  show add Timing dialog
-    showAddTimingDialog(item) {
-      
-      if (item == null && this.isAddTiming == true) {
-        this.addTimingText = `Add  ${this.entity}`;
-        this.addTimingDialog = true;
-        this.addUpdateButtonText = " Add ";
-      } else {
-        
-        this.item = Object.assign({}, item);
-        this.addTimingText = `Edit ${this.addTimingText} : ` + item.clinic_full_name;
-        this.addTimingDialog = true;
-        this.addUpdateButtonText = "Update";
-        this.getClinicTiming();
       }
     },
     //#endregion
@@ -424,7 +352,40 @@ export const clinicMaster = {
         }
       }
     },
+    //#endregion
 
+    //#region To get the Clinic Service
+    getClinicService() {
+      this.isDialogLoaderActive = true;
+      ApiService.get(
+        ApiEndPoint.Clinic.webGetClinicService,
+        {}
+      )
+        .then((response) => {
+          this.isDialogLoaderActive = false;
+          console.log(response);
+          this.clinicServiceItems = response.data.resultData;
+        })
+        .catch((error) => {
+          this.isDialogLoaderActive = false;
+          if (error.response.status != 401 && error.response.status != 403) {
+            this.showErrorAlert(true, "error", "Something went wrong");
+          }
+        });
+
+
+    },
+    //#endregion
+    
+    //#region  show add Service dialog
+    showAddServiceDialog(item) {
+      if (this.isAddService == true) {
+        this.addServiceText = `Add Clinic Service `;
+        this.addServiceDialog = true;
+        this.addUpdateButtonText = " Add ";
+        // this.item.clinic_service_name=item.city_name;
+      }
+    },
     //#endregion
 
     //#region  add Service item
@@ -432,7 +393,6 @@ export const clinicMaster = {
       if (this.$refs.holdingFormAddService.validate()) {
         if (this.isAddService) {
           // save
-
           this.isDialogLoaderActive = true;
           ApiService.post(ApiEndPoint.Clinic.webSaveClinicService, {
             clinic_id: this.item.clinic_id,
@@ -458,36 +418,39 @@ export const clinicMaster = {
                 Global.showErrorAlert(true, "error", "Something went wrong");
               }
             });
-        } else {
-          //update
-
-          this.isDialogLoaderActive = true;
-          ApiService.post(ApiEndPoint.Clinic.webUpdateClinicService, {
-            clinic_id: this.item.clinic_id,
-            clinic_service_name: this.item.clinic_service_name,
-            
-          })
-            .then((response) => {
-              this.isDialogLoaderActive = false;
-              this.close();
-              if (response.data.result == "success") {
-                Global.showSuccessAlert(true, "success", response.data.message);
-                this.getClinicService();
-              } else if (response.data.result == "error") {
-                Global.showErrorAlert(true, "error", response.data.message);
-              }
-            })
-            .catch((error) => {
-              this.isDialogLoaderActive = false;
-
-              if (
-                error.response.status != 401 ||
-                error.response.status != 403
-              ) {
-                Global.showErrorAlert(true, "error", "Something went wrong");
-              }
-            });
         }
+      }
+    },
+    //#endregion
+
+    //#region To get the Clinic Timing
+    getClinicTiming() {
+      this.isDialogLoaderActive = true;
+      ApiService.get(
+        ApiEndPoint.Clinic.webGetClinicTiming,
+        {}
+      )
+        .then((response) => {
+          this.isDialogLoaderActive = false;
+          console.log(response);
+          this.clinicTimingItems = response.data.resultData;
+        })
+        .catch((error) => {
+          this.isDialogLoaderActive = false;
+          if (error.response.status != 401 && error.response.status != 403) {
+            this.showErrorAlert(true, "error", "Something went wrong");
+          }
+        });
+    },
+    //#endregion
+
+    //#region  show add Timing dialog
+    showAddTimingDialog(item) { 
+      if (this.isAddTiming == true) {
+        this.addTimingText = `Add Clinic Timing `;
+        this.addTimingDialog = true;
+        this.addUpdateButtonText = " Add ";
+       
       }
     },
     //#endregion
@@ -497,7 +460,6 @@ export const clinicMaster = {
       if (this.$refs.holdingFormAddTiming.validate()) {
         if (this.isAddTiming) {
           // save
-
           this.isDialogLoaderActive = true;
           ApiService.post(ApiEndPoint.Clinic.webSaveClinicTiming, {
             clinic_id: this.item.clinic_id,
@@ -523,41 +485,10 @@ export const clinicMaster = {
                 Global.showErrorAlert(true, "error", "Something went wrong");
               }
             });
-        } else {
-          //update
-          this.isDialogLoaderActive = true;
-          ApiService.post(ApiEndPoint.Clinic.webUpdateClinicTiming, {
-            clinic_id: this.item.clinic_id,
-            clinic_days: this.item.clinic_days,
-            clinic_timing_id: this.item.clinic_timing_id,
-            clinic_timing: this.item.clinic_timing,
-          })
-            .then((response) => {
-              
-              this.isDialogLoaderActive = false;
-              this.close();
-              if (response.data.result == "success") {
-                Global.showSuccessAlert(true, "success", response.data.message);
-                this.getClinicTiming();
-              } else if (response.data.result == "error") {
-                Global.showErrorAlert(true, "error", response.data.message);
-              }
-            })
-            .catch((error) => {
-              this.isDialogLoaderActive = false;
-
-              if (
-                error.response.status != 401 ||
-                error.response.status != 403
-              ) {
-                Global.showErrorAlert(true, "error", "Something went wrong");
-              }
-            });
         }
       }
     },
     //#endregion
-
 
     //#region  to close the dialog
     close() {

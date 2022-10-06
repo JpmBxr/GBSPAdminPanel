@@ -98,75 +98,8 @@ export const cityMaster = {
     },
   },
   methods: {
-    searchInfo() {
-      clearTimeout(this._timerId);
-      this._timerId = setTimeout(() => {
-        this.getDetails();
-      }, 500);
-    },
-    close() {
-      this.addEditDialog = false;
-      setTimeout(() => {
-        this.item = Object.assign({}, this.defaultItem);
-      }, 300);
-    },
-    // add edit
-    addEditItem() {
-      if (this.$refs.holdingFormAddEdit.validate()) {
-        if (this.isAddEdit) {
-          // save
-          this.apiCallPost(ApiEndPoint.City.saveCity, {
-            city_name: this.item.city_name,
-          });
-          this.close();
-        } else {
-          this.apiCallPost(ApiEndPoint.City.updateCity, {
-            city_name: this.item.city_name,
-            Id: this.item.city_id,
-          });
-
-          this.close();
-        }
-      }
-    },
-    //show add edit dialog
-    showAddEditDialog(item) {
-      if (item == null && this.isAddEdit == true) {
-        this.addEditText = `Add New ${this.entity}`;
-        this.addEditDialog = true;
-        this.addUpdateButtonText = " Add ";
-      } else {
-        this.item = Object.assign({}, item);
-        this.addEditText = `Edit ${this.entity} : ` + item.city_name;
-        this.addEditDialog = true;
-        this.addUpdateButtonText = "Update";
-      }
-    },
-    // enable disable
-    async enableDisableItem(item) {
-      console.log(item);
-      const result = await Global.showConfirmationAlert(
-        `Change  ${this.entity} : ${item.city_name} Status`,
-        "Are you sure to change the status",
-        "warning"
-      );
-      if (result.isConfirmed) {
-        this.apiCallPost(ApiEndPoint.City.changeCityStatus, {
-          Id: item.city_id,
-          city_status: item.city_is_active,
-        });
-      } else {
-        if (item.city_is_active == false) {
-          item.city_is_active = true;
-        } else {
-          item.city_is_active = false;
-        }
-      }
-    },
     // #region Get Details
     getDetails() {
-      console.log("Entry");
-
       this.isLoaderActive = true;
       let { page, itemsPerPage, sortDesc, sortBy } = this.pagination;
       sortDesc = sortDesc.length > 0 && sortDesc[0] ? "desc" : "asc";
@@ -192,7 +125,136 @@ export const cityMaster = {
           }
         });
     },
-    // delete
+
+    //show add edit dialog
+    showAddEditDialog(item) {
+      if (item == null && this.isAddEdit == true) {
+        this.addEditText = `Add New ${this.entity}`;
+        this.addEditDialog = true;
+        this.addUpdateButtonText = " Add ";
+      } else {
+        this.item = Object.assign({}, item);
+        this.addEditText = `Edit ${this.entity} : ` + item.city_name;
+        this.addEditDialog = true;
+        this.addUpdateButtonText = "Update";
+      }
+    },
+
+     //#region add Edit
+     addEditItem() {
+      if (this.$refs.holdingFormAddEdit.validate()) {
+        if (this.isAddEdit) {
+          // save
+          this.isDialogLoaderActive = true;
+          ApiService.post(ApiEndPoint.City.saveCity, {
+            city_name: this.item.city_name,
+          })
+            .then((response) => {
+              this.isDialogLoaderActive = false;
+              this.getDetails();
+              this.close();
+              if (response.data.success == "true") {
+                Global.showSuccessAlert(true, "success", response.data.message);
+              } else if (response.data.result == "error") {
+                Global.showErrorAlert(true, "error", response.data.message);
+              }
+            })
+            .catch((error) => {
+              this.isDialogLoaderActive = false;
+              if (
+                error.response.status != 401 ||
+                error.response.status != 403
+              ) {
+                Global.showErrorAlert(true, "error", "Something went wrong");
+              }
+            });
+
+        }else {
+          //update
+          this.isDialogLoaderActive = true;
+          ApiService.post(ApiEndPoint.City.updateCity, {
+            city_name: this.item.city_name,
+            Id: this.item.city_id,
+          })
+            .then((response) => {
+              this.isDialogLoaderActive = false;
+              this.getDetails();
+              this.close();
+              if (response.data.success == "true") {
+                Global.showSuccessAlert(true, "success", response.data.message);
+              } else if (response.data.result == "error") {
+                Global.showErrorAlert(true, "error", response.data.message);
+              }
+            })
+            .catch((error) => {
+              this.isDialogLoaderActive = false;
+
+              if (
+                error.response.status != 401 ||
+                error.response.status != 403
+              ) {
+                Global.showErrorAlert(true, "error", "Something went wrong");
+              }
+            });
+        }
+      }
+    },
+    //#endregion
+
+    searchInfo() {
+      clearTimeout(this._timerId);
+      this._timerId = setTimeout(() => {
+        this.getDetails();
+      }, 500);
+    },
+    close() {
+      this.addEditDialog = false;
+      setTimeout(() => {
+        this.item = Object.assign({}, this.defaultItem);
+      }, 300);
+    },
+
+     //#region  enable disable
+     async enableDisableItem(item) {
+      const result = await Global.showConfirmationAlert(
+        `Change  ${this.entity} : ${item.city_name} Status`,
+        "Are you sure to change the status",
+        "warning"
+      );
+      if (result.isConfirmed) {
+        this.isLoaderActive = true;
+
+        ApiService.post(ApiEndPoint.City.changeCityStatus, {
+          Id: item.city_id,
+          city_status: item.city_is_active,
+        })
+          .then((response) => {
+            this.isLoaderActive = false;
+            if (response.data.success == "true") {
+              Global.showSuccessAlert(true, "success", response.data.message);
+              this.getDetails();
+            } else if (response.data.result == "error") {
+              Global.showErrorAlert(true, "error", response.data.message);
+            }
+          })
+          .catch((error) => {
+            this.isLoaderActive = false;
+
+            if (error.response.status != 401 || error.response.status != 403) {
+              Global.showErrorAlert(true, "error", "Something went wrong");
+            }
+          });
+      } else {
+        if (item.city_is_active == false) {
+          item.city_is_active = true;
+        } else {
+          item.city_is_active = false;
+        }
+      }
+    },
+    //#endregion
+
+    //#region Delete Item
     async deleteItem(item) {
       const result = await Global.showConfirmationAlert(
         `Delete Specialization ${item.city_name}`,
@@ -200,30 +262,27 @@ export const cityMaster = {
         "warning"
       );
       if (result.isConfirmed) {
-        this.apiCallPost(ApiEndPoint.City.deleteCity, {
+        this.isLoaderActive = true;
+        ApiService.post(ApiEndPoint.City.deleteCity, {
           city_id: item.city_id,
-        });
-      }
-    },
-
-    apiCallPost(endPoint, parameter) {
-      ApiService.post(endPoint, parameter)
-        .then((response) => {
-          this.isLoaderActive = false;
-          if (response.data.success == "true") {
-            Global.showSuccessAlert(true, "success", response.data.message);
-            this.getDetails();
-          } else if (response.data.result == "error") {
-            Global.showErrorAlert(true, "error", response.data.message);
-          }
         })
-        .catch((error) => {
-          this.isLoaderActive = false;
-          console.log(error);
-          if (error.response.status != 401 || error.response.status != 403) {
-            Global.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
+          .then((response) => {
+            this.isLoaderActive = false;
+            if (response.data.success == "true") {
+              Global.showSuccessAlert(true, "success", response.data.message);
+              this.getDetails();
+            } else if (response.data.result == "error") {
+              Global.showErrorAlert(true, "error", response.data.message);
+            }
+          })
+          .catch((error) => {
+            this.isLoaderActive = false;
+
+            if (error.response.status != 401 || error.response.status != 403) {
+              Global.showErrorAlert(true, "error", "Something went wrong");
+            }
+          });
+      }
     },
     // #endregion
   },

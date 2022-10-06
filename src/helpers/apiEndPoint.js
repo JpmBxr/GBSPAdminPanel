@@ -31,6 +31,7 @@ export const ApiEndPoint = {
     updateArea: "updateArea",
     changeAreaStatus: "changeAreaStatus",
     deleteArea: "deleteArea",
+    getWithoutPaginationCity: "getWithoutPaginationCity",
   },
   //#endregion
 
@@ -59,11 +60,9 @@ export const ApiEndPoint = {
 
     webGetClinicService: "webGetClinicService",
     webSaveClinicService: "webSaveClinicService",
-    webUpdateClinicService: "webUpdateClinicService",
-
+   
     webGetClinicTiming: "webGetClinicTiming",
     webSaveClinicTiming: "webSaveClinicTiming",
-    webUpdateClinicTiming: "webUpdateClinicTiming",
   },
   //#endregion
   // <-------------------------------------END------------------------------------------------------>

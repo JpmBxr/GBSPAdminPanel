@@ -115,17 +115,7 @@
             </v-switch>
           </template>
 
-          <template v-slot:item.actions="{ item }">
-            <v-icon
-              size="30"
-              class="mx-1 fitPotPrimaryIcon"
-              @click="
-                isAddEdit = false;
-                showAddEditDialog(item);
-              "
-              >mdi-square-edit-outline</v-icon
-            >
-
+          <template v-slot:item.add="{ item }">
             <v-icon
               size="30"
               class="mr-0 ml-1 fitPotErrorIcon"
@@ -140,6 +130,18 @@
               @click="isAddService = true;
               showAddTimingDialog(item);"
               >mdi-clock-edit-outline</v-icon
+            >
+          </template>
+
+          <template v-slot:item.update="{ item }">
+            <v-icon
+              size="30"
+              class="mx-1 fitPotPrimaryIcon"
+              @click="
+                isAddEdit = false;
+                showAddEditDialog(item);
+              "
+              >mdi-square-edit-outline</v-icon
             >
           </template>
         </v-data-table>

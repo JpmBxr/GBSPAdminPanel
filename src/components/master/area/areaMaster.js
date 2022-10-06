@@ -83,8 +83,8 @@ export const areaMaster = {
       //end
     };
   },
-  async created() {
-    this.cityItems = await this.getAll("getWithoutPaginationCity", {});
+  created() {
+    this.getCity();
     this.getDetails();
   },
   computed: {
@@ -108,86 +108,8 @@ export const areaMaster = {
     },
   },
   methods: {
-    getAll(endPoint, payload) {
-      return new ApiService.get(endPoint, payload)
-        .then((response) => {
-          return response.data.resultData;
-        })
-        .catch((error) => {
-          if (error.response.status != 401 && error.response.status != 403) {
-            this.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
-    },
-    searchInfo() {
-      clearTimeout(this._timerId);
-      this._timerId = setTimeout(() => {
-        this.getDetails();
-      }, 500);
-    },
-    close() {
-      this.addEditDialog = false;
-      setTimeout(() => {
-        this.item = Object.assign({}, this.defaultItem);
-      }, 300);
-    },
-    // add edit
-    addEditItem() {
-      if (this.$refs.holdingFormAddEdit.validate()) {
-        if (this.isAddEdit) {
-          // save
-          this.apiCallPost(ApiEndPoint.Area.saveArea, {
-            area_name: this.item.area_name,
-            city_id: this.item.city_id,
-          });
-          this.close();
-        } else {
-          this.apiCallPost(ApiEndPoint.Area.updateArea, {
-            area_name: this.item.area_name,
-            Id: this.item.area_id,
-            city_id: this.item.city_id,
-          });
-
-          this.close();
-        }
-      }
-    },
-    //show add edit dialog
-    showAddEditDialog(item) {
-      if (item == null && this.isAddEdit == true) {
-        this.addEditText = `Add New ${this.entity}`;
-        this.addEditDialog = true;
-        this.addUpdateButtonText = " Add ";
-      } else {
-        this.item = Object.assign({}, item);
-        this.addEditText = `Edit ${this.entity} : ` + item.area_name;
-        this.addEditDialog = true;
-        this.addUpdateButtonText = "Update";
-      }
-    },
-    // enable disable
-    async enableDisableItem(item) {
-      console.log(item);
-      const result = await Global.showConfirmationAlert(
-        `Change  ${this.entity} : ${item.area_name} Status`,
-        "Are you sure to change the status",
-        "warning"
-      );
-      if (result.isConfirmed) {
-        this.apiCallPost(ApiEndPoint.Area.changeAreaStatus, {
-          Id: item.area_id,
-          area_status: item.area_is_active,
-        });
-      } else {
-        if (item.area_is_active == false) {
-          item.area_is_active = true;
-        } else {
-          item.area_is_active = false;
-        }
-      }
-    },
-    // #region Get Details
-    getDetails() {
+     // #region Get Details
+     getDetails() {
       this.isLoaderActive = true;
       let { page, itemsPerPage, sortDesc, sortBy } = this.pagination;
       sortDesc = sortDesc.length > 0 && sortDesc[0] ? "desc" : "asc";
@@ -212,7 +134,159 @@ export const areaMaster = {
           }
         });
     },
-    // delete
+
+    //#region  to load City
+    async getCity() {
+      this.isDialogLoaderActive = true;
+      try {
+        const response = await ApiService.get(
+          ApiEndPoint.Area.getWithoutPaginationCity,
+          {}
+        );
+        this.isDialogLoaderActive = false;
+        this.cityItems = response.data.resultData;
+      } catch (error) {
+        this.isDialogLoaderActive = false;
+        if (error.response?.status != 401 && error.response?.status != 403) {
+          Global.showErrorAlert(true, "error", "Something went wrong");
+        }
+      }
+    },
+    //#endregion
+
+
+    
+    searchInfo() {
+      clearTimeout(this._timerId);
+      this._timerId = setTimeout(() => {
+        this.getDetails();
+      }, 500);
+    },
+    close() {
+      this.addEditDialog = false;
+      setTimeout(() => {
+        this.item = Object.assign({}, this.defaultItem);
+      }, 300);
+    },
+
+    //show add edit dialog
+    showAddEditDialog(item) {
+      if (item == null && this.isAddEdit == true) {
+        this.addEditText = `Add New ${this.entity}`;
+        this.addEditDialog = true;
+        this.addUpdateButtonText = " Add ";
+      } else {
+        this.item = Object.assign({}, item);
+        this.addEditText = `Edit ${this.entity} : ` + item.area_name;
+        this.addEditDialog = true;
+        this.addUpdateButtonText = "Update";
+      }
+    },
+
+    //#region add Edit
+    addEditItem() {
+      if (this.$refs.holdingFormAddEdit.validate()) {
+        if (this.isAddEdit) {
+          // save
+          this.isDialogLoaderActive = true;
+          ApiService.post(ApiEndPoint.Area.saveArea, {
+            area_name: this.item.area_name,
+            city_id: this.item.city_id,
+          })
+            .then((response) => {
+              this.isDialogLoaderActive = false;
+              this.getDetails();
+              this.close();
+              if (response.data.success == "true") {
+                Global.showSuccessAlert(true, "success", response.data.message);
+              } else if (response.data.result == "error") {
+                Global.showErrorAlert(true, "error", response.data.message);
+              }
+            })
+            .catch((error) => {
+              this.isDialogLoaderActive = false;
+              if (
+                error.response.status != 401 ||
+                error.response.status != 403
+              ) {
+                Global.showErrorAlert(true, "error", "Something went wrong");
+              }
+            });
+
+        }else {
+          //update
+          this.isDialogLoaderActive = true;
+          ApiService.post(ApiEndPoint.Area.updateArea, {
+            area_name: this.item.area_name,
+            Id: this.item.area_id,
+            city_id: this.item.city_id,  
+          })
+            .then((response) => {
+              this.isDialogLoaderActive = false;
+              this.getDetails();
+              this.close();
+              if (response.data.success == "true") {
+                Global.showSuccessAlert(true, "success", response.data.message);
+              } else if (response.data.result == "error") {
+                Global.showErrorAlert(true, "error", response.data.message);
+              }
+            })
+            .catch((error) => {
+              this.isDialogLoaderActive = false;
+
+              if (
+                error.response.status != 401 ||
+                error.response.status != 403
+              ) {
+                Global.showErrorAlert(true, "error", "Something went wrong");
+              }
+            });
+        }
+      }
+    },
+    //#endregion
+
+     //#region  enable disable
+     async enableDisableItem(item) {
+      const result = await Global.showConfirmationAlert(
+        `Change  ${this.entity} : ${item.area_name} Status`,
+        "Are you sure to change the status",
+        "warning"
+      );
+      if (result.isConfirmed) {
+        this.isLoaderActive = true;
+
+        ApiService.post(ApiEndPoint.Area.changeAreaStatus, {
+          Id: item.area_id,
+          area_status: item.area_is_active,
+        })
+          .then((response) => {
+            this.isLoaderActive = false;
+            if (response.data.success == "true") {
+              Global.showSuccessAlert(true, "success", response.data.message);
+              this.getDetails();
+            } else if (response.data.result == "error") {
+              Global.showErrorAlert(true, "error", response.data.message);
+            }
+          })
+          .catch((error) => {
+            this.isLoaderActive = false;
+
+            if (error.response.status != 401 || error.response.status != 403) {
+              Global.showErrorAlert(true, "error", "Something went wrong");
+            }
+          });
+      } else {
+        if (item.area_is_active == false) {
+          item.area_is_active = true;
+        } else {
+          item.area_is_active = false;
+        }
+      }
+    },
+    //#endregion
+
+    //#region Delete Item
     async deleteItem(item) {
       const result = await Global.showConfirmationAlert(
         `Delete Specialization ${item.area_name}`,
@@ -220,30 +294,27 @@ export const areaMaster = {
         "warning"
       );
       if (result.isConfirmed) {
-        this.apiCallPost(ApiEndPoint.Area.deleteArea, {
+        this.isLoaderActive = true;
+        ApiService.post(ApiEndPoint.Area.deleteArea, {
           area_id: item.area_id,
-        });
-      }
-    },
-
-    apiCallPost(endPoint, parameter) {
-      ApiService.post(endPoint, parameter)
-        .then((response) => {
-          this.isLoaderActive = false;
-          if (response.data.success == "true") {
-            Global.showSuccessAlert(true, "success", response.data.message);
-            this.getDetails();
-          } else if (response.data.result == "error") {
-            Global.showErrorAlert(true, "error", response.data.message);
-          }
         })
-        .catch((error) => {
-          this.isLoaderActive = false;
-          console.log(error);
-          if (error.response.status != 401 || error.response.status != 403) {
-            Global.showErrorAlert(true, "error", "Something went wrong");
-          }
-        });
+          .then((response) => {
+            this.isLoaderActive = false;
+            if (response.data.success == "true") {
+              Global.showSuccessAlert(true, "success", response.data.message);
+              this.getDetails();
+            } else if (response.data.result == "error") {
+              Global.showErrorAlert(true, "error", response.data.message);
+            }
+          })
+          .catch((error) => {
+            this.isLoaderActive = false;
+
+            if (error.response.status != 401 || error.response.status != 403) {
+              Global.showErrorAlert(true, "error", "Something went wrong");
+            }
+          });
+      }
     },
     // #endregion
   },
