@@ -365,6 +365,7 @@
                       </template>
                     </v-text-field>
                   </v-col>
+                  
                   <v-col cols="12" md="6">
                     <v-file-input
                       v-model="doctorProfileImage"
@@ -383,6 +384,7 @@
                           <strong>*</strong>
                         </span>
                       </template>
+
                       <template v-slot:selection="{ index, text }">
                         <v-chip
                           v-if="index < 2"
